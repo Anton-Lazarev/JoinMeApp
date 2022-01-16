@@ -1,0 +1,26 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/core_service
+    username: postgres
+    password: 12345678
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQL9Dialect
+
+logging:
+  config: logback.xml
+
+upload:
+  path: src/main/resources/static/upload
+  url: /usr_img/
+  aws: https://litvinovaprogrammersblog-storage.s3.us-east-2.amazonaws.com
+
+jsa:
+ aws_access_key_id: AKIAVXMX5EVA2JRHZC5A #${aws_access_key_id}
+ aws_secret_access_key: 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 #${aws_secret_access_key}
+ s3_bucket: litvinovaprogrammersblog-storage #${s3_bucket}
+ s3_region: us-east-2 #${s3_region}

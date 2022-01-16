@@ -1,0 +1,26 @@
+apply plugin: "io.gitlab.arturbosch.detekt"    // open command line and execute from project root dir gradlew detekt or ./gradlew detekt
+
+detekt {
+    toolVersion = detektVersion
+    parallel = true
+    // Builds the Abstract Syntax Tree in parallel. Rules are always executed in parallel. Can lead to speedups in larger projects. `false` by default.
+    basePath = projectDir               // shows class paths from src dir
+    config = files("detekt-config.yml")
+    autoCorrect = true
+    reports {
+        html {
+            enabled = true
+            destination = file("build/reports/detekt/detekt.html")
+            // open from explorer or http://localhost:63342/CoreService/build/reports/detekt/detekt.html
+        }
+        xml {
+            enabled = false
+        }
+        txt {
+            enabled = false
+        }
+        sarif {
+            enabled = false
+        }
+    }
+}

@@ -1,0 +1,68 @@
+package com.dataart.coreservice.controllers
+
+import com.dataart.coreservice.dto.EventDto
+import com.dataart.coreservice.dto.ListEventDto
+import com.dataart.coreservice.dto.UserJoinEventDto
+import com.dataart.coreservice.mappers.EventMapper
+import com.dataart.coreservice.services.EventService
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.RestController
+
+@RestController
+@RequestMapping("/events")
+class EventController(
+    private val eventService: EventService,
+    private val eventMapper: EventMapper
+) {
+
+    private val logger: Logger = LoggerFactory.getLogger(javaClass)
+
+    @PostMapping
+    fun add(@RequestBody eventRequest: EventDto) = with(eventRequest) {
+        logger.info("addEvent request: {}", desc())
+        eventService.add(this).also {
+            logger.info("addEvent response: {}", it)
+        }
+    }
+
+    @GetMapping("/{id}")
+    fun getById(@PathVariable id: Long) = with(id) {
+        logger.info("getEvent request: {}", this)
+        eventService.getById(this)
+            .let { eventMapper.convertToEventDtoResponse(it) }
+            .also { logger.info("getEvent response: {}", it.desc()) }
+    }
+
+    @GetMapping
+    fun getEvents(): ListEventDto {
+        logger.info("getEvents request: {}", this)
+        return eventService.getEvents()
+            .let { eventMapper.convertToEventSliderDtoResponse(it) }
+            .let { ListEventDto(it) }
+            .also { logger.info("getEvents response {}", it) }
+    }
+
+    @PostMapping("/join")
+    fun join(@RequestBody userJoinEventDto: UserJoinEventDto) {
+        logger.info("joinEvent request: {}", userJoinEventDto.desc())
+        eventService.joinEvent(userJoinEventDto)
+        logger.info(
+            "joinEvent request {} successfully added", userJoinEventDto.desc()
+        ) // если вылетает ошибка в сервисе то сюда не возвращается выполнение
+    }
+
+    @GetMapping("/user")
+    fun getAllEventsByUserId(@RequestParam("id") id: Long): List<EventDto> {
+        logger.info("User's events is going to be shown")
+        return eventService.getAllByUserId(id)
+            .let { eventMapper.convertToEventDtoResponse(it) }
+            .also { logger.info("getAllEventsByUserId response {}", it.toString()) }
+    }
+}
